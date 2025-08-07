@@ -31,12 +31,19 @@ function Login() {
   }, [user, navigate]);
 
   return (
+    
     <form onSubmit={handleLogin}>
-      <h2>Login</h2>
+      <div className='d-flex justify-content-center align-items-center vh-100 vw-100'>
+      <div className='d-flex flex-column gap-2'>
+
+      <h2 className='text-center'>IG Attendance</h2>
       <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
       <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
       <button type="submit" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
       {error && <p style={{ color: 'red' }}>{error}</p>}
+      </div>
+
+  </div>
     </form>
   );
 }

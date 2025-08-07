@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAttendancePaginated } from '../features/attendance/attendanceThunks';
+import { fetchAttendanceExport, fetchAttendancePaginated } from '../features/attendance/attendanceThunks';
 import { setPage, setFilters } from '../features/attendance/attendanceSlice';
 import { logout } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { handleExportRows } from '../utils/handleExportRows';
 
 function AdminPanel() {
   const dispatch = useDispatch();
@@ -97,15 +98,61 @@ function AdminPanel() {
     );
   };
 
-  return (
-    <div style={{ padding: '20px' }}>
-      <h2>Admin Panel</h2>
-      <button onClick={handleLogout}>Logout</button>
-      &nbsp;
-      <button onClick={handleRegister}>+ Register New User</button>
 
+  //  const getTimeDifference = (checkIn, checkOut) => {
+  //   const today = new Date().toDateString();
+  //   const inTime = new Date(`${today} ${checkIn}`);
+  //   const outTime = new Date(`${today} ${checkOut}`);
+
+  //   const diffMs = outTime - inTime;
+
+  //   if (diffMs < 0) return 'Invalid';
+
+  //   const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  //   const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  //   return `${hours}h ${minutes}m`;
+  // };
+
+  return (
+    <div className='d-flex justify-content-center align-items-center vh-100 vw-100'>
+
+    <div className='d-flex flex-column p-1'>
+      <div className='d-flex justify-content-between'>
+        <h2 style={{fontSize:"22px"}}>Admin Panel</h2>
+        <dv>
+          <button onClick={handleLogout}>Logout</button>
+          &nbsp;
+          <button onClick={handleRegister}>+ Register New User</button>
+          &nbsp;
+          <button onClick={()=>{
+            dispatch(fetchAttendanceExport(filters)) .unwrap()
+  .then((data) => {
+    console.log(data);
+    
+
+   const customHeaders = {
+  'user.name': 'Employee Name',
+  'user.email': 'Email',
+  date: 'Date',
+  checkInTime: 'Check-In Time',
+  checkOutTime: 'Check-Out Time',
+  duration:"Total Hours",
+};
+
+    handleExportRows(data.data,customHeaders,["totalRecords","checkInLocation","checkOutLocation","user._id","_id"]);
+
+  })
+  .catch((error) => {
+    console.error("Export failed:", error);
+  });
+          }}>Export</button>
+        </dv>
+      </div>
+
+<hr />
       {/* Filters */}
-      <div style={{ marginTop: '1rem' }}>
+      <div className='d-flex flex-wrap gap-2 mt-2'>
         <label>
           From:{' '}
           <input
@@ -138,7 +185,7 @@ function AdminPanel() {
           </select>
         </label>
         &nbsp;
-        <button onClick={handleClearFilters}>Clear</button>
+        <button className='p-0 p-1 px-3' style={{fontSize:"14px"}} onClick={handleClearFilters}>Clear</button>
       </div>
 
       {/* Attendance Table */}
@@ -146,21 +193,24 @@ function AdminPanel() {
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       <table border="1" style={{ marginTop: '1rem', width: '100%' }}>
-        <thead>
+        <thead style={{border: '1px solid black'}}>
           <tr>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Check-In</th>
-            <th>Check-Out</th>
+            <th style={{border:"1px solid black"}}>Name</th>
+            <th style={{border:"1px solid black"}}>Date</th>
+            <th style={{border:"1px solid black"}}>Check-In</th>
+            <th style={{border:"1px solid black"}}>Check-Out</th>
+            <th style={{border:"1px solid black"}}>Total Hours</th>
+            
           </tr>
         </thead>
-        <tbody>
+        <tbody >
           {records?.map((rec, i) => (
             <tr key={i}>
-              <td>{rec.user?.name}</td>
-              <td>{new Date(rec.date).toLocaleDateString()}</td>
-              <td>{rec.checkInTime || '-'}</td>
-              <td>{rec.checkOutTime || '-'}</td>
+              <td style={{border:"1px solid black"}}>{rec.user?.name}</td>
+              <td style={{border:"1px solid black"}}>{new Date(rec.date).toLocaleDateString()}</td>
+              <td style={{border:"1px solid black"}}>{rec.checkInTime || '-'}</td>
+              <td style={{border:"1px solid black"}}>{rec.checkOutTime || '-'}</td>
+              <td style={{border:"1px solid black"}}>{rec.duration || "-"}</td>
             </tr>
           ))}
         </tbody>
@@ -169,6 +219,8 @@ function AdminPanel() {
       {/* Pagination */}
       {renderPagination()}
     </div>
+    </div>
+
   );
 }
 

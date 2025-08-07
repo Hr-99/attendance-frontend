@@ -28,6 +28,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: rgb(235, 235, 235);
 }
 
 h1 {
@@ -65,4 +66,19 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+
+
+
+
+ input,select{
+  background-color: white !important;
+  border-radius: 5px !important;
+  border: 1px solid black !important;
+  color: black !important;
+}
+
+label{
+  font-weight: 500;
 }

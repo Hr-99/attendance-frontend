@@ -57,6 +57,26 @@ export const fetchAttendancePaginated = createAsyncThunk(
     }
   }
 );
+export const fetchAttendanceExport = createAsyncThunk(
+  'attendance/fetchAttendanceExport',
+  async ({ from, to, user }, thunkAPI) => {
+    try {
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', 0);
+      queryParams.append('limit', 0);
+      if (from) queryParams.append('from', from);
+      if (to) queryParams.append('to', to);
+      if (user) queryParams.append('user', user);
+
+      console.log('FETCHING:', queryParams.toString()); // Optional debug
+
+      const response = await api.get(`/attendance/all?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.error || 'Fetch failed');
+    }
+  }
+);
 
 
 
